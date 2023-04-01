@@ -7,8 +7,7 @@ import time
 from urllib.request import urlopen
 import urllib.parse
 
-from main.constant import isReleaseVersion, isRelease, app_name, dev_ding_url, dev_ding_secret, release_ding_secret, \
-    release_ding_url
+from . import constant
 
 dict = {
     "msgtype": "markdown",
@@ -47,8 +46,8 @@ def genDingTalkMsg(ding_url, secret, title, msg, isAtAll):
     dongtai_ding_final_url = f'{ding_url}&timestamp={getTimestamp()}&sign={get_sign}'
 
     # 把文案内容写入请求格式中
-    dict["markdown"]["title"] = f'{app_name}:{title}'
-    dict["markdown"]["text"] = f'{app_name}:{msg}'
+    dict["markdown"]["title"] = f'{constant.constant.get_app_name()}:{title}'
+    dict["markdown"]["text"] = f'{constant.constant.get_app_name()}:{msg}'
     dict["at"]["isAtAll"] = isAtAll
     header = {
         "Content-Type": "application/json",
@@ -67,9 +66,10 @@ def genDingTalkMsg(ding_url, secret, title, msg, isAtAll):
             if object["errcode"] == 0:
                 break
 
-            print(f'{isReleaseVersion()} genDingTalkMsg{dongtai_ding_final_url} errcode ：{object["errcode"]}')
+            print(
+                f'{constant.constant.is_release_version()} genDingTalkMsg{dongtai_ding_final_url} errcode ：{object["errcode"]}')
         except BaseException as e:
-            print(f'{isReleaseVersion()} genDingTalkMsg{dongtai_ding_final_url} 报错 ： {e}')
+            print(f'{constant.constant.is_release_version()} genDingTalkMsg{dongtai_ding_final_url} 报错 ： {e}')
         finally:
             times -= 1
 
@@ -78,10 +78,10 @@ def genDingTalkMsg(ding_url, secret, title, msg, isAtAll):
 
 
 def getDingAccount():
-    if isRelease():
-        return release_ding_url, release_ding_secret
+    if constant.constant.is_release():
+        return constant.constant.get_release_ding_url(), constant.constant.get_release_ding_secret()
     else:
-        return dev_ding_url, dev_ding_secret
+        return constant.constant.get_dev_ding_url(), constant.constant.get_dev_ding_secret()
 
 
 def unimportantMsg(title, msg):

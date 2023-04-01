@@ -40,10 +40,10 @@ def getSign(secret):
 lock = threading.RLock()
 
 
-def genDingTalkMsg(ding_url, secret, title, msg, isAtAll):
+def genDingTalkMsg(ding_url, secret, title, msg, isAtAll=False):
     lock.acquire()
-    get_sign = getSign(secret)
-    dongtai_ding_final_url = f'{ding_url}&timestamp={getTimestamp()}&sign={get_sign}'
+    # get_sign = getSign(secret)
+    # dongtai_ding_final_url = f'{ding_url}&timestamp={getTimestamp()}&sign={get_sign}'
 
     # 把文案内容写入请求格式中
     dict["markdown"]["title"] = f'{constant.constant.get_app_name()}:{title}'
@@ -60,16 +60,16 @@ def genDingTalkMsg(ding_url, secret, title, msg, isAtAll):
     while times > 0:
         time.sleep(3)
         try:
-            opener = sendDingMsg(dongtai_ding_final_url, sendDatas, header)
+            opener = sendDingMsg(f'{ding_url}&timestamp={getTimestamp()}&sign={getSign(secret)}', sendDatas, header)
             result = opener.read()
             object = json.loads(result)
             if object["errcode"] == 0:
                 break
 
             print(
-                f'{constant.constant.is_release_version()} genDingTalkMsg{dongtai_ding_final_url} errcode ：{object["errcode"]}')
+                f'{constant.constant.is_release_version()} genDingTalkMsg{ding_url} errcode ：{object["errcode"]}')
         except BaseException as e:
-            print(f'{constant.constant.is_release_version()} genDingTalkMsg{dongtai_ding_final_url} 报错 ： {e}')
+            print(f'{constant.constant.is_release_version()} genDingTalkMsg{ding_url} 报错 ： {e}')
         finally:
             times -= 1
 
